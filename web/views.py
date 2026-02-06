@@ -46,3 +46,43 @@ def productoDetalle(request, producto_id):
         'producto': objProducto,
     }
     return render(request, 'producto.html', context)
+
+""" VISTAS PARA EL CARRITO DE COMPRAS"""
+
+from .carrito import Cart
+from django.shortcuts import redirect
+
+def carrito(request):
+    """Vista para mostrar el carrito de compras"""
+    return render(request, 'carrito.html')
+
+def agregarCarrito(request, producto_id):
+    """Vista para agregar un producto al carrito de compras"""
+    
+    if request.method == 'POST':
+        cantidad = int(request.POST['cantidad'])
+    else:
+        cantidad = 1
+
+    objProducto = Producto.objects.get(pk=producto_id)
+    carritoProducto = Cart(request)
+    carritoProducto.add(objProducto, cantidad)
+
+    #print(request.session.get('cart'))
+
+    if request.method == 'GET':
+        return redirect('/')
+    return render(request, 'carrito.html')
+
+def eliminarProductoCarrito(request, producto_id):
+    objProducto = Producto.objects.get(pk=producto_id)
+    carritoProducto = Cart(request)
+    carritoProducto.delete(objProducto)
+
+    return render(request, 'carrito.html')
+
+def limpiarCarrito(request):
+    carritoProducto = Cart(request)
+    carritoProducto.clear()
+
+    return render(request, 'carrito.html')
